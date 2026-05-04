@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cipher Toolkit</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; }
+        h1 { color: #333; }
+        .section { margin-bottom: 30px; }
+        label { display: block; margin-top: 10px; }
+        input, select, button { margin-top: 5px; }
+        .output { margin-top: 10px; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <h1>Cipher Toolkit</h1>
+    <div class="section">
+        <h2>Caesar Cipher</h2>
+        <label>Text: <input type="text" id="caesarText"></label>
+        <label>Shift: <input type="number" id="caesarShift" value="3"></label>
+        <button onclick="caesarEncrypt()">Encrypt</button>
+        <button onclick="caesarDecrypt()">Decrypt</button>
+        <div class="output" id="caesarOutput"></div>
+    </div>
+    <div class="section">
+        <h2>Monoalphabetic Cipher</h2>
+        <label>Text: <input type="text" id="monoText"></label>
+        <button onclick="monoEncrypt()">Encrypt</button>
+        <button onclick="monoDecrypt()">Decrypt</button>
+        <div class="output" id="monoOutput"></div>
+    </div>
+    <div class="section">
+        <h2>Vigenere Cipher</h2>
+        <label>Text: <input type="text" id="vigText"></label>
+        <label>Key: <input type="text" id="vigKey"></label>
+        <button onclick="vigenereEncrypt()">Encrypt</button>
+        <button onclick="vigenereDecrypt()">Decrypt</button>
+        <div class="output" id="vigOutput"></div>
+    </div>
+    <script>
+        // Caesar Cipher
+        function caesarEncrypt() {
+            const text = document.getElementById('caesarText').value;
+            const shift = parseInt(document.getElementById('caesarShift').value) || 0;
+            document.getElementById('caesarOutput').textContent = 'Encrypted: ' + caesar(text, shift);
+        }
+        function caesarDecrypt() {
+            const text = document.getElementById('caesarText').value;
+            const shift = parseInt(document.getElementById('caesarShift').value) || 0;
+            document.getElementById('caesarOutput').textContent = 'Decrypted: ' + caesar(text, -shift);
+        }
+        function caesar(text, shift) {
+            return text.split('').map(char => {
+                if (/[a-z]/.test(char)) {
+                    return String.fromCharCode((char.charCodeAt(0) - 97 + shift + 26) % 26 + 97);
+                } else if (/[A-Z]/.test(char)) {
+                    return String.fromCharCode((char.charCodeAt(0) - 65 + shift + 26) % 26 + 65);
+                } else {
+                    return char;
+                }
+            }).join('');
+        }
+        // Monoalphabetic Cipher
+        const monoKey = 'QWERTYUIOPASDFGHJKLZXCVBNM';
+        const monoRevKey = {};
+        for (let i = 0; i < 26; i++) monoRevKey[monoKey[i]] = String.fromCharCode(65 + i);
+        function monoEncrypt() {
+            const text = document.getElementById('monoText').value.toUpperCase();
+            let result = '';
+            for (let char of text) {
+                if (/[A-Z]/.test(char)) {
+                    result += monoKey[char.charCodeAt(0) - 65];
+                } else {
+                    result += char;
+                }
+            }
+            document.getElementById('monoOutput').textContent = 'Encrypted: ' + result;
+        }
+        function monoDecrypt() {
+            const text = document.getElementById('monoText').value.toUpperCase();
+            let result = '';
+            for (let char of text) {
+                if (monoRevKey[char]) {
+                    result += monoRevKey[char];
+                } else {
+                    result += char;
+                }
+            }
+            document.getElementById('monoOutput').textContent = 'Decrypted: ' + result;
+        }
+        // Vigenere Cipher
+        function vigenereEncrypt() {
+            const text = document.getElementById('vigText').value;
+            const key = document.getElementById('vigKey').value.toUpperCase();
+            let result = '';
+            let j = 0;
+            for (let i = 0; i < text.length; i++) {
+                let char = text[i];
+                if (/[a-zA-Z]/.test(char)) {
+                    let shift = key[j % key.length].charCodeAt(0) - 65;
+                    if (/[A-Z]/.test(char)) {
+                        result += String.fromCharCode((char.charCodeAt(0) - 65 + shift) % 26 + 65);
+                    } else {
+                        result += String.fromCharCode((char.charCodeAt(0) - 97 + shift) % 26 + 97);
+                    }
+                    j++;
+                } else {
+                    result += char;
+                }
+            }
+            document.getElementById('vigOutput').textContent = 'Encrypted: ' + result;
+        }
+        function vigenereDecrypt() {
+            const text = document.getElementById('vigText').value;
+            const key = document.getElementById('vigKey').value.toUpperCase();
+            let result = '';
+            let j = 0;
+            for (let i = 0; i < text.length; i++) {
+                let char = text[i];
+                if (/[a-zA-Z]/.test(char)) {
+                    let shift = key[j % key.length].charCodeAt(0) - 65;
+                    if (/[A-Z]/.test(char)) {
+                        result += String.fromCharCode((char.charCodeAt(0) - 65 - shift + 26) % 26 + 65);
+                    } else {
+                        result += String.fromCharCode((char.charCodeAt(0) - 97 - shift + 26) % 26 + 97);
+                    }
+                    j++;
+                } else {
+                    result += char;
+                }
+            }
+            document.getElementById('vigOutput').textContent = 'Decrypted: ' + result;
+        }
+    </script>
+</body>
+</html>
